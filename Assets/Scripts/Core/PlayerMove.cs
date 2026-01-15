@@ -27,7 +27,7 @@ namespace Core
                 return;
             
             Vector3 moveDir = new Vector3(_moveInput.x, 0f, _moveInput.y);
-            moveDir = moveDir.sqrMagnitude > 1f + Mathf.Epsilon ? moveDir.normalized : Vector3.zero;
+            moveDir = moveDir.sqrMagnitude > Mathf.Epsilon ? moveDir.normalized : Vector3.zero;
             
             transform.position += _speed * Time.deltaTime * moveDir;
         }
