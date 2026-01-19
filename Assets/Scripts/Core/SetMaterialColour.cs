@@ -22,7 +22,6 @@ namespace Core
         
         private void SetColour(Color prev, Color next, bool asServer)
         {
-            Debug.Log("SET " + Colour.Value);
             GetComponent<MeshRenderer>().material.color = Colour.Value;
         }
     }

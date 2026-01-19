@@ -1,6 +1,8 @@
-﻿using FishNet.Object;
+﻿using System;
+using FishNet.Object;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 namespace Core
 {
@@ -28,6 +30,20 @@ namespace Core
             
             Spawn(obj);
             obj.GetComponent<SetMaterialColour>().Colour.Value = Random.ColorHSV();
+        }
+    }
+    
+    public class PlayerBuilder : NetworkObject
+    {
+        private struct BuildData
+        {
+            public int Id;
+            public int TeamId;
+        }
+        
+        public PlayerBuilder GetPlayer()
+        {
+            return null;
         }
     }
 }
