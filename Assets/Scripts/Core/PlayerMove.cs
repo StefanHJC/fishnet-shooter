@@ -9,7 +9,6 @@ namespace Core
     {
         [SerializeField] private PlayerInput _input;
         [SerializeField] private float _speed;
-
         
         private Vector2 _moveInput;
 

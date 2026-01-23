@@ -94,5 +94,4 @@ namespace Core
             _player.transform.position += _player.Speed * Time.deltaTime * moveDir;
         }
     }
-
 }
