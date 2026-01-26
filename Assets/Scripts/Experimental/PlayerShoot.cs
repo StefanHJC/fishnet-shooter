@@ -88,7 +88,13 @@ namespace Experimental
             ClientManager.RegisterBroadcast<TracerBroadcast>(OnTracerBroadcast_Client);
             ServerManager.RegisterBroadcast<TracerBroadcast>(OnTracerBroadcast_Server);
         }
-        
+
+        private void OnDisable()
+        {
+            ClientManager.UnregisterBroadcast<TracerBroadcast>(OnTracerBroadcast_Client);
+            ServerManager.UnregisterBroadcast<TracerBroadcast>(OnTracerBroadcast_Server);
+        }
+
         [Server]
         private void OnTracerBroadcast_Server(NetworkConnection conn, TracerBroadcast msg, Channel _)
         {

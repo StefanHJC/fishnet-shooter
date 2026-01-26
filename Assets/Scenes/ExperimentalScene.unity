@@ -977,7 +977,7 @@ MonoBehaviour:
   _authenticator: {fileID: 0}
   _remoteClientTimeout: 2
   _remoteClientTimeoutDuration: 60
-  _allowPredictedSpawning: 1
+  _allowPredictedSpawning: 0
   _reservedObjectIds: 15
   _syncTypeRate: 0.1
   SpawnPacking:
