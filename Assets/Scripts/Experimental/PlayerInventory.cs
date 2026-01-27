@@ -76,8 +76,8 @@ namespace Experimental
         {
             //Todo play anim
             Debug.Log($"{LogUtils.Client} Reload complete");
-            //BulletsLeft = count;
-            //_bulletsTotalLeft -= count;
+            BulletsLeft = count;
+            _bulletsTotalLeft -= count;
         }
 
         [TargetRpc]

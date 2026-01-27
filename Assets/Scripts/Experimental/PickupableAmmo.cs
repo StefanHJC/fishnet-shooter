@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using FishNet.Connection;
 using FishNet.Object;
+using TMPro;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -18,8 +20,9 @@ namespace Experimental
 
         private Vector3 _cachedPos;
         private AmmoType _type;
+        private bool _isPickedUp;
+        private bool _isSpawned;
         private int _count;
-        
         
         public override void OnStartServer()
         {
@@ -29,6 +32,8 @@ namespace Experimental
             
             if (_type == AmmoType.Bullets)
                 _count *= PlayerInventory.BulletsPerMagazine;
+            
+            _isSpawned = true;
         }
 
         public override void OnStartClient()
@@ -62,6 +67,9 @@ namespace Experimental
         [Server]
         private async UniTaskVoid SpawnAsync_Server()
         {
+            if (_isSpawned)
+                return;
+            
             await UniTask.WaitForSeconds(Random.Range(_spawnTimeInterval.x, _spawnTimeInterval.y));
             
             Debug.Log($"{LogUtils.Server} Spawn Ammo");
@@ -71,9 +79,9 @@ namespace Experimental
             if (_type == AmmoType.Bullets)
                 _count *= PlayerInventory.BulletsPerMagazine;
             
-            
             Vector3 randomPos = Random.insideUnitCircle * _spawnRadius;
             transform.position = new Vector3(_cachedPos.x + randomPos.x, _cachedPos.y, _cachedPos.z + randomPos.y);
+            _isPickedUp = false;
             
             Spawn_ObserverCmd(transform.position, _type);
         }
@@ -81,8 +89,15 @@ namespace Experimental
         [ServerRpc(RequireOwnership =  false)]
         private void RequestPickupAmmo_ServerCmd(NetworkConnection conn)
         {
+            if (_isPickedUp)
+                return;
+            
             //TODO: validate player pos
             Debug.Log($"{LogUtils.Server} RequestPickupAmmo ServerCmd");
+
+            _isPickedUp = true;
+            _isSpawned = false;
+            
             conn!.FirstObject.GetComponent<PlayerInventory>().Add_Server(conn, _type, _count);
             gameObject.SetActive(false);
             OnPickupConfirmed_ObserverCmd();
@@ -123,6 +138,23 @@ namespace Experimental
                     _grenadeMesh.gameObject.SetActive(true);
                     break;
             }
+        }
+    }
+
+    public class ScoreTable : NetworkBehaviour
+    {
+        [SerializeField] private List<ScoreRecord> _playerRecords;
+        
+        [Serializable]
+        public struct ScoreRecord
+        {
+            public TMP_Text NickField;
+            public TMP_Text KillsField;
+            public TMP_Text DeathField;
+            
+            public string Nick;
+            public string Kills;
+            public string Death;
         }
     }
 }
