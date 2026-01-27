@@ -1,6 +1,10 @@
-﻿using FishNet.Connection;
+﻿using System.Numerics;
+using FishNet.Connection;
 using FishNet.Object;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Experimental
 {
@@ -76,7 +80,8 @@ namespace Experimental
         [ObserversRpc]
         private void Throw_ObserverCmd(Vector3 impulse, NetworkObject nob)
         {
-            nob.GetComponent<Rigidbody>().AddForce(impulse, ForceMode.Impulse);
+            PlayerGrenade grenade = nob.GetComponent<PlayerGrenade>();
+            grenade.Rigidbody.AddForce(impulse, ForceMode.Impulse);
         }
     }
 }

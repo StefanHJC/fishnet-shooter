@@ -12,15 +12,17 @@ namespace Experimental
         [SerializeField] private Transform _camera;
         [SerializeField] private Transform _weapon;
         [SerializeField] private PlayerShoot _shoot;
+        [SerializeField] private PlayerInventory _ammo;
         [SerializeField] private PlayerThrowGrenade _grenade;
         [SerializeField] private Vector2 _cameraClamp;
         [SerializeField] private MeshRenderer _renderer;
         [SerializeField] private float _sensivity;
         [SerializeField] private float _speed;
-        
+
         private readonly SyncVar<Color> _color = new();
         private InputAction _attackAction;
         private InputAction _grenadeAction;
+        private InputAction _reloadAction;
         private Vector2 _moveInput;
         private Vector2 _lookInput;
         private float _rotationX;
@@ -50,6 +52,7 @@ namespace Experimental
             //Cursor.lockState = CursorLockMode.Locked;
             _attackAction = _input.currentActionMap.FindAction("Attack");
             _grenadeAction = _input.currentActionMap.FindAction("Throw");
+            _reloadAction = _input.currentActionMap.FindAction("Reload");
         }
 
         [ServerRpc]
@@ -78,6 +81,9 @@ namespace Experimental
             
             if (_grenadeAction.WasPressedThisFrame())
                 _grenade.OnUse();
+            
+            if (_reloadAction.WasPressedThisFrame())
+                _ammo.TryReload_Client();
         }
 
         private void LateUpdate()

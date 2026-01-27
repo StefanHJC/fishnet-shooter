@@ -1,18 +1,22 @@
 using System;
+using Cysharp.Threading.Tasks;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Experimental
 {
     public class PlayerHealth : NetworkBehaviour
     {   
         [SerializeField] private int _maxHealth;
+        [SerializeField] private ParticleSystem _vfx;
+        [SerializeField] private GameObject _mesh;
 
         private readonly SyncVar<int> _currentHealth = new();
         private int _predictedHealth;
-        
+
         public event Action<int> OnChanged;
         public event Action<int> OnPredictionChanged;
 
@@ -37,9 +41,9 @@ namespace Experimental
         [Client(RequireOwnership = false)]
         public void ReduceHealthPrediction_Client(int damage)
         {
-            _predictedHealth -= damage;
-            OnPredictionChanged?.Invoke(_predictedHealth);
-            GetComponentInChildren<PlayerHealthBar>().SetPredicted(_predictedHealth);
+            //_predictedHealth -= damage;
+            //OnPredictionChanged?.Invoke(_predictedHealth);
+            //GetComponentInChildren<PlayerHealthBar>().SetPredicted(_predictedHealth);
         }
 
         private void Awake()
@@ -51,7 +55,7 @@ namespace Experimental
         [ServerRpc]
         private void RequestInit_ServerCmd(NetworkConnection conn=null)
         {
-            conn.FirstObject.GetComponent<PlayerHealth>().SetHealth_Server(_maxHealth);
+            conn!.FirstObject.GetComponent<PlayerHealth>().SetHealth_Server(_maxHealth);
         }
 
         private void OnServerSetHealth(int prev, int next, bool asServer) => OnChanged?.Invoke(next);
@@ -59,6 +63,18 @@ namespace Experimental
         [ObserversRpc]
         private void Die_ObserverCmd()
         {
+            PlayVfxAndDie_Client().Forget();
+        }
+
+        [Client]
+        private async UniTaskVoid PlayVfxAndDie_Client()
+        {
+            GetComponent<PlayerInput>().DeactivateInput();
+            _mesh.SetActive(false);
+            _vfx.Play();
+
+            await UniTask.WaitForSeconds(_vfx.main.duration);
+            
             gameObject.SetActive(false);
             Debug.Log($"{LogUtils.Client} Player died");
         }

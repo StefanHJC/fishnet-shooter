@@ -54,6 +54,7 @@ namespace Experimental
         [SerializeField] private TrailRenderer _tracerPrefab;
         [SerializeField] private ParticleSystem _muzzleFlash;
         [SerializeField] private ParticleSystem _bulletMist;
+        [SerializeField] private PlayerInventory _ammo;
         [SerializeField] private Animator _weaponAnim;
         [SerializeField] private Transform _firePoint;
         [SerializeField] private Vector3 _spreadRange;
@@ -120,7 +121,7 @@ namespace Experimental
         [Client]
         public void TryShot_Client()
         {
-            if (_lastShootTime + _shootDelay >= Time.time)
+            if (_lastShootTime + _shootDelay >= Time.time || _ammo.BulletsLeft <= 0 )
                 return;
 
             Vector3 dir = GetDirection();
@@ -151,6 +152,8 @@ namespace Experimental
                 ShooterId = Owner.ClientId,
             }, Channel.Unreliable);
 
+            _ammo.BulletsLeft--;
+            
             if (Physics.Raycast(origin, dir, out RaycastHit hit, 100))
             {
                 //TODO: Trail
